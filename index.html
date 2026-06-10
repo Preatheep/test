@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LASIK, Layer by Layer — An Interactive 3D Guide</title>
-<meta name="description" content="Click through every step of LASIK eye surgery on an interactive 3D eye model, and explore the layers of the cornea in 3D.">
+<title>LASIK vs Contoura vs SMILE — An Interactive 3D Guide</title>
+<meta name="description" content="Compare LASIK, Contoura Vision and SMILE laser eye surgery on interactive 3D eye models, step by step — and see which might suit you.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -23,19 +23,22 @@
 <header class="hero">
   <div class="hero-inner">
     <span class="hero-badge">Interactive 3D guide</span>
-    <h1>LASIK, <span class="accent">Layer by Layer</span></h1>
+    <h1>Laser Eye Surgery, <span class="accent">in 3D</span></h1>
     <p class="hero-sub">
-      Laser-Assisted In Situ Keratomileusis reshapes the cornea to correct vision —
-      and it all happens in a tissue thinner than a credit card.
-      Click through each step on a 3D eye model to see exactly what happens, layer by layer.
+      Three ways to reshape the cornea and free yourself from glasses — <strong>LASIK</strong>,
+      <strong>Contoura&nbsp;Vision</strong> and <strong>SMILE</strong>. Explore each one step by step
+      on an interactive 3D eye, compare the differences, and see which might suit you.
     </p>
     <div class="hero-stats">
-      <div class="stat"><strong>~25 min</strong><span>for both eyes</span></div>
-      <div class="stat"><strong>0 stitches</strong><span>flap self-seals</span></div>
+      <div class="stat"><strong>3 procedures</strong><span>side by side</span></div>
       <div class="stat"><strong>Drops only</strong><span>no needles</span></div>
+      <div class="stat"><strong>~10 min/eye</strong><span>typical laser time</span></div>
       <div class="stat"><strong>~24 hrs</strong><span>to clearer vision</span></div>
     </div>
-    <a href="#procedure" class="hero-cta">Start the walkthrough ↓</a>
+    <div class="hero-ctas">
+      <a href="#procedure" class="hero-cta">Explore the procedures ↓</a>
+      <a href="#compare" class="hero-cta ghost">Compare them</a>
+    </div>
   </div>
 </header>
 
@@ -43,8 +46,11 @@
 
 <!-- ============ PROCEDURE WALKTHROUGH ============ -->
 <section id="procedure" class="section">
-  <h2 class="section-title">The procedure, step by step</h2>
-  <p class="section-sub">Click a step — or press the arrow keys — to watch the surgery unfold on the 3D eye. Drag to rotate, scroll to zoom.</p>
+  <h2 class="section-title">Walk through each procedure</h2>
+  <p class="section-sub">Pick a procedure, then click a step (or use the arrow keys) to watch it on the 3D eye. Drag to rotate, pinch or scroll to zoom.</p>
+
+  <div class="proc-tabs" id="procTabs" role="tablist" aria-label="Choose a procedure"></div>
+  <p class="proc-blurb" id="procBlurb"></p>
 
   <div class="walkthrough">
 
@@ -54,12 +60,12 @@
 
     <div class="stage-wrap">
       <div class="stage-frame">
-        <div id="stage3d" class="canvas3d stage3d" aria-label="3D eye model showing the current LASIK step">
+        <div id="stage3d" class="canvas3d stage3d" aria-label="3D eye model showing the current step">
           <p class="webgl-fallback" hidden>Your browser doesn't support WebGL, so the 3D model can't be shown. The step descriptions below still walk you through the whole procedure.</p>
         </div>
         <div class="stage-overlay">
           <span id="stageCaption" class="stage-caption"></span>
-          <span class="stage-hint">drag to rotate · scroll to zoom</span>
+          <span class="stage-hint">drag to rotate · pinch/scroll to zoom</span>
         </div>
         <div class="stage-progress"><div id="progressBar"></div></div>
       </div>
@@ -82,10 +88,22 @@
   </div>
 </section>
 
+<!-- ============ COMPARISON ============ -->
+<section id="compare" class="section alt">
+  <h2 class="section-title">How they compare</h2>
+  <p class="section-sub">The big difference is the flap: LASIK and Contoura lift one; SMILE doesn't. Here's how that ripples through everything else.</p>
+
+  <div class="compare-grid" id="compareGrid" role="table" aria-label="Comparison of LASIK, Contoura Vision and SMILE"></div>
+
+  <h2 class="section-title choose-title">Which might suit you?</h2>
+  <p class="section-sub">A quick starting point — your surgeon's exam is what ultimately decides.</p>
+  <div class="choose-grid" id="chooseGrid"></div>
+</section>
+
 <!-- ============ LAYER EXPLORER ============ -->
-<section id="layers" class="section alt">
+<section id="layers" class="section">
   <h2 class="section-title">Explore the cornea's six layers in 3D</h2>
-  <p class="section-sub">The whole cornea is about 540 µm thick — half a millimetre. Click a layer in the 3D model (or a chip below it) to pull it out of the stack and see what LASIK does to it. Thicknesses are exaggerated for visibility.</p>
+  <p class="section-sub">All three procedures reshape the same tissue. The cornea is about 540 µm thick — half a millimetre. Click a layer in the model (or a chip below) to pull it out and see what each surgery does to it. Thicknesses are exaggerated for visibility.</p>
 
   <div class="explorer">
     <div class="explorer-left">
@@ -99,7 +117,7 @@
       <span class="thickness-chip" id="layerThickness"></span>
       <p id="layerDesc"></p>
       <div class="lasik-note">
-        <strong>During LASIK:</strong>
+        <strong>During surgery:</strong>
         <p id="layerLasik"></p>
       </div>
     </aside>
@@ -107,12 +125,12 @@
 </section>
 
 <!-- ============ VIDEO ============ -->
-<section id="video" class="section">
+<section id="video" class="section alt">
   <h2 class="section-title">Watch the real procedure</h2>
-  <p class="section-sub">This guide is based on the video below — see the actual surgery footage.</p>
+  <p class="section-sub">This guide is based on the video below — see actual surgery footage.</p>
   <div class="video-frame">
     <iframe src="https://www.youtube.com/embed/YzZre0OcLXQ"
-            title="LASIK eye surgery video"
+            title="Laser eye surgery video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen loading="lazy"></iframe>
   </div>
@@ -121,8 +139,8 @@
 </main>
 
 <footer class="footer">
-  <p><strong>Educational use only.</strong> This page simplifies a medical procedure for learning purposes and is not medical advice.
-     Candidacy, risks, and outcomes vary — always consult a qualified ophthalmologist.</p>
+  <p><strong>Educational use only.</strong> This page simplifies medical procedures for learning purposes and is not medical advice.
+     Candidacy, risks, costs and outcomes vary by individual and by clinic — always consult a qualified ophthalmologist before choosing a treatment.</p>
 </footer>
 
 <script type="module" src="main.js"></script>
