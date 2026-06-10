@@ -3,23 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LASIK, Layer by Layer — An Interactive Guide</title>
-<meta name="description" content="Click through every step of LASIK eye surgery and explore the layers of the cornea in an interactive, animated guide.">
+<title>LASIK, Layer by Layer — An Interactive 3D Guide</title>
+<meta name="description" content="Click through every step of LASIK eye surgery on an interactive 3D eye model, and explore the layers of the cornea in 3D.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/controls/OrbitControls.js": "./vendor/OrbitControls.js"
+  }
+}
+</script>
 </head>
 <body>
 
 <header class="hero">
   <div class="hero-inner">
-    <span class="hero-badge">Interactive guide</span>
+    <span class="hero-badge">Interactive 3D guide</span>
     <h1>LASIK, <span class="accent">Layer by Layer</span></h1>
     <p class="hero-sub">
       Laser-Assisted In Situ Keratomileusis reshapes the cornea to correct vision —
       and it all happens in a tissue thinner than a credit card.
-      Click through each step to see exactly what happens, layer by layer.
+      Click through each step on a 3D eye model to see exactly what happens, layer by layer.
     </p>
     <div class="hero-stats">
       <div class="stat"><strong>~25 min</strong><span>for both eyes</span></div>
@@ -36,7 +44,7 @@
 <!-- ============ PROCEDURE WALKTHROUGH ============ -->
 <section id="procedure" class="section">
   <h2 class="section-title">The procedure, step by step</h2>
-  <p class="section-sub">Click a step — or press the arrow keys — to watch the surgery unfold on the corneal cross-section.</p>
+  <p class="section-sub">Click a step — or press the arrow keys — to watch the surgery unfold on the 3D eye. Drag to rotate, scroll to zoom.</p>
 
   <div class="walkthrough">
 
@@ -46,177 +54,13 @@
 
     <div class="stage-wrap">
       <div class="stage-frame">
-        <svg id="stage" viewBox="0 0 900 560" role="img" aria-labelledby="stageTitle">
-          <title id="stageTitle">Animated cross-section of the cornea during LASIK</title>
-
-          <defs>
-            <linearGradient id="chamberGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#bfe6f5"/>
-              <stop offset="1" stop-color="#eaf7fc" stop-opacity="0"/>
-            </linearGradient>
-            <radialGradient id="glowGrad" cx="0.5" cy="0.5" r="0.5">
-              <stop offset="0" stop-color="#7ddc9c" stop-opacity="0.55"/>
-              <stop offset="1" stop-color="#7ddc9c" stop-opacity="0"/>
-            </radialGradient>
-            <linearGradient id="beamGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#b66bff"/>
-              <stop offset="1" stop-color="#7c3aed"/>
-            </linearGradient>
-          </defs>
-
-          <!-- ======== BASE CORNEAL SLAB ======== -->
-          <g id="slab">
-            <rect x="80" y="448" width="740" height="80" fill="url(#chamberGrad)"/>
-            <text class="svg-label faint" x="450" y="505" text-anchor="middle">Anterior chamber (inside the eye)</text>
-
-            <rect id="band-tear"  x="80" y="300" width="740" height="6"  fill="#9fdcf2"/>
-            <rect id="band-epi"   x="80" y="306" width="740" height="24" fill="#f6c9a8"/>
-            <rect id="band-bow"   x="80" y="330" width="740" height="10" fill="#e0a071"/>
-            <rect id="band-stroma" x="80" y="340" width="740" height="90" fill="#fbe3c9"/>
-            <g stroke="#eecda4" stroke-width="1.5" opacity="0.8">
-              <line x1="84" y1="356" x2="816" y2="356"/>
-              <line x1="84" y1="372" x2="816" y2="372"/>
-              <line x1="84" y1="388" x2="816" y2="388"/>
-              <line x1="84" y1="404" x2="816" y2="404"/>
-              <line x1="84" y1="420" x2="816" y2="420"/>
-            </g>
-            <rect id="band-des"  x="80" y="430" width="740" height="8"  fill="#d98f63"/>
-            <rect id="band-endo" x="80" y="438" width="740" height="10" fill="#c4734a"/>
-
-            <!-- layer name tags -->
-            <g class="svg-label" text-anchor="end">
-              <text x="74" y="307">Tear film</text>
-              <text x="74" y="322">Epithelium</text>
-              <text x="74" y="339">Bowman's</text>
-              <text x="74" y="389">Stroma</text>
-              <text x="74" y="437">Descemet's</text>
-              <text x="74" y="448">Endothelium</text>
-            </g>
-          </g>
-
-          <!-- Gap revealed when the flap is lifted -->
-          <rect id="bedGap" x="258" y="298" width="356" height="80" class="bg-fill hidden-el"/>
-          <!-- Tissue removed by the excimer laser (carved divot) -->
-          <path id="divot" d="M260,378 Q436,400 612,378 Z" class="bg-fill hidden-el"/>
-          <line id="bedLine" x1="260" y1="378" x2="612" y2="378" stroke="#c98e5d" stroke-width="2" class="hidden-el"/>
-          <path id="bedCurve" d="M260,378 Q436,400 612,378" fill="none" stroke="#c98e5d" stroke-width="2" class="hidden-el"/>
-
-          <!-- ======== THE FLAP ======== -->
-          <g id="flap">
-            <g>
-              <path d="M260,306 L602,306 Q616,342 602,378 L260,378 Z" fill="#fbe3c9"/>
-              <path d="M260,306 L604,306 Q612,318 612,330 L260,330 Z" fill="#f6c9a8"/>
-              <path d="M260,330 L612,330 Q613,335 612,340 L260,340 Z" fill="#e0a071"/>
-              <path d="M260,306 L602,306 Q616,342 602,378 L260,378" fill="none"
-                    stroke="#b97a4e" stroke-width="2" id="flapOutline" class="hidden-el"/>
-              <circle cx="262" cy="342" r="5" fill="#b97a4e" id="hingeDot" class="hidden-el"/>
-            </g>
-          </g>
-          <text id="flapTag" class="svg-label hidden-el" x="330" y="150">Corneal flap<tspan x="330" dy="14">(folded back on its hinge)</tspan></text>
-
-          <!-- Interface seam after repositioning -->
-          <path id="seam" d="M260,378 Q436,388 612,378 Q616,344 604,308" fill="none"
-                stroke="#b97a4e" stroke-width="2" stroke-dasharray="7 6" class="hidden-el"/>
-
-          <!-- ======== STEP 1: TOPOGRAPHY ======== -->
-          <g id="fx-topo" class="fx hidden-el">
-            <g class="topo-rings" fill="none" stroke-width="3" opacity="0.85">
-              <ellipse cx="436" cy="306" rx="40"  ry="9"  stroke="#ef4444"/>
-              <ellipse cx="436" cy="306" rx="90"  ry="18" stroke="#f97316"/>
-              <ellipse cx="436" cy="306" rx="145" ry="27" stroke="#eab308"/>
-              <ellipse cx="436" cy="306" rx="205" ry="36" stroke="#22c55e"/>
-              <ellipse cx="436" cy="306" rx="268" ry="45" stroke="#3b82f6"/>
-            </g>
-            <line x1="436" y1="240" x2="436" y2="372" stroke="#0f7490" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <g class="scanline"><line x1="120" y1="306" x2="780" y2="306" stroke="#0ea5e9" stroke-width="2.5" opacity="0.9"/></g>
-            <text class="svg-label" x="436" y="120" text-anchor="middle">Corneal topographer maps thousands of points
-              <tspan x="436" dy="15">to chart the cornea's exact shape and thickness</tspan></text>
-          </g>
-
-          <!-- ======== STEP 2: NUMBING DROPS ======== -->
-          <g id="fx-drops" class="fx hidden-el">
-            <g transform="translate(436,40)">
-              <rect x="-14" y="0" width="28" height="62" rx="12" fill="#38b6d8"/>
-              <rect x="-9" y="-12" width="18" height="14" rx="4" fill="#1d8aa8"/>
-              <path d="M-7,62 L7,62 L2,84 L-2,84 Z" fill="#38b6d8"/>
-            </g>
-            <circle class="droplet" cx="436" cy="135" r="9" fill="#4fc3e8"/>
-            <circle class="droplet d2" cx="436" cy="135" r="7" fill="#4fc3e8"/>
-            <ellipse class="ripple" cx="436" cy="302" rx="14" ry="4" fill="none" stroke="#38b6d8" stroke-width="2.5"/>
-            <text class="svg-label" x="436" y="240" text-anchor="middle">Anaesthetic drops numb the surface — no needles</text>
-          </g>
-
-          <!-- ======== STEP 3: SUCTION RING ======== -->
-          <g id="fx-suction" class="fx hidden-el">
-            <g class="press">
-              <path d="M210,210 Q436,150 662,210" fill="none" stroke="#64748b" stroke-width="10" stroke-linecap="round"/>
-              <rect x="196" y="206" width="34" height="92" rx="8" fill="#94a3b8"/>
-              <rect x="642" y="206" width="34" height="92" rx="8" fill="#94a3b8"/>
-              <rect x="190" y="290" width="46" height="10" rx="4" fill="#64748b"/>
-              <rect x="636" y="290" width="46" height="10" rx="4" fill="#64748b"/>
-            </g>
-            <text class="svg-label" x="436" y="120" text-anchor="middle">A gentle suction ring holds the eye perfectly still
-              <tspan x="436" dy="15">— vision dims for a few seconds, which is normal</tspan></text>
-          </g>
-
-          <!-- ======== STEP 4: FEMTOSECOND LASER ======== -->
-          <g id="fx-femto" class="fx hidden-el">
-            <g transform="translate(436,30)">
-              <rect x="-110" y="0" width="220" height="52" rx="10" fill="#334155"/>
-              <rect x="-22" y="52" width="44" height="16" rx="4" fill="#475569"/>
-              <text class="svg-label inverse" x="0" y="31" text-anchor="middle">FEMTOSECOND LASER</text>
-            </g>
-            <g class="femto-beam">
-              <line x1="0" y1="98" x2="0" y2="374" stroke="#f43f5e" stroke-width="3" opacity="0.9"/>
-              <circle cx="0" cy="376" r="5" fill="#f43f5e"/>
-            </g>
-            <path id="cutPath" class="drawing-cut" d="M612,310 Q616,344 606,374 L264,376" fill="none"
-                  stroke="#ef4444" stroke-width="3" stroke-dasharray="8 6"/>
-            <g class="bubbles" fill="#fda4af">
-              <circle cx="300" cy="377" r="4"/><circle cx="360" cy="379" r="5"/>
-              <circle cx="420" cy="377" r="4"/><circle cx="480" cy="379" r="5"/>
-              <circle cx="540" cy="377" r="4"/><circle cx="596" cy="372" r="4"/>
-            </g>
-            <text class="svg-label" x="436" y="140" text-anchor="middle">Millions of micro-bubbles trace a flap outline
-              <tspan x="436" dy="15">about 110 µm below the surface — in ~15 seconds</tspan></text>
-          </g>
-
-          <!-- ======== STEP 6: EXCIMER LASER ======== -->
-          <g id="fx-excimer" class="fx hidden-el">
-            <g transform="translate(500,30)">
-              <rect x="-110" y="0" width="220" height="52" rx="10" fill="#3b2a63"/>
-              <rect x="-22" y="52" width="44" height="16" rx="4" fill="#4c3a78"/>
-              <text class="svg-label inverse" x="0" y="31" text-anchor="middle">EXCIMER LASER · COOL UV</text>
-            </g>
-            <g class="uv-beams" stroke="url(#beamGrad)" stroke-width="4" stroke-linecap="round">
-              <line x1="468" y1="100" x2="330" y2="372"/>
-              <line x1="486" y1="100" x2="400" y2="378"/>
-              <line x1="500" y1="100" x2="460" y2="380"/>
-              <line x1="514" y1="100" x2="520" y2="378"/>
-              <line x1="532" y1="100" x2="580" y2="372"/>
-            </g>
-            <g class="sparks" fill="#c4b5fd">
-              <circle cx="350" cy="368" r="3"/><circle cx="436" cy="372" r="3.5"/><circle cx="540" cy="368" r="3"/>
-            </g>
-            <text class="svg-label" x="742" y="150" text-anchor="middle">Each pulse vaporises
-              <tspan x="742" dy="15">~0.25 µm of stroma,</tspan>
-              <tspan x="742" dy="15">sculpting your prescription</tspan>
-              <tspan x="742" dy="15">into the cornea</tspan></text>
-          </g>
-
-          <!-- ======== STEP 8: HEALING GLOW ======== -->
-          <g id="fx-heal" class="fx hidden-el">
-            <ellipse class="heal-glow" cx="436" cy="340" rx="240" ry="90" fill="url(#glowGrad)"/>
-            <g class="sparkle" fill="#34d399">
-              <path d="M310,250 l5,12 12,5 -12,5 -5,12 -5,-12 -12,-5 12,-5 Z"/>
-              <path d="M560,235 l4,10 10,4 -10,4 -4,10 -4,-10 -10,-4 10,-4 Z"/>
-              <path d="M450,210 l6,14 14,6 -14,6 -6,14 -6,-14 -14,-6 14,-6 Z"/>
-            </g>
-            <text class="svg-label" x="436" y="160" text-anchor="middle">The epithelium seals the flap edge within hours —
-              <tspan x="436" dy="15">most people read the clock clearly the next morning</tspan></text>
-          </g>
-        </svg>
-
+        <div id="stage3d" class="canvas3d stage3d" aria-label="3D eye model showing the current LASIK step">
+          <p class="webgl-fallback" hidden>Your browser doesn't support WebGL, so the 3D model can't be shown. The step descriptions below still walk you through the whole procedure.</p>
+        </div>
+        <div class="stage-overlay">
+          <span id="stageCaption" class="stage-caption"></span>
+          <span class="stage-hint">drag to rotate · scroll to zoom</span>
+        </div>
         <div class="stage-progress"><div id="progressBar"></div></div>
       </div>
 
@@ -240,11 +84,16 @@
 
 <!-- ============ LAYER EXPLORER ============ -->
 <section id="layers" class="section alt">
-  <h2 class="section-title">Explore the cornea's six layers</h2>
-  <p class="section-sub">The whole cornea is about 540 µm thick — half a millimetre. Click any layer to see what it does and what LASIK does to it.</p>
+  <h2 class="section-title">Explore the cornea's six layers in 3D</h2>
+  <p class="section-sub">The whole cornea is about 540 µm thick — half a millimetre. Click a layer in the 3D model (or a chip below it) to pull it out of the stack and see what LASIK does to it. Thicknesses are exaggerated for visibility.</p>
 
   <div class="explorer">
-    <div class="layer-stack" id="layerStack" role="tablist" aria-label="Corneal layers"></div>
+    <div class="explorer-left">
+      <div id="layers3d" class="canvas3d layers3d" aria-label="Exploded 3D view of the six corneal layers">
+        <p class="webgl-fallback" hidden>Your browser doesn't support WebGL, so the 3D layers can't be shown. Use the buttons below to read about each layer.</p>
+      </div>
+      <div class="layer-chips" id="layerChips" role="tablist" aria-label="Corneal layers"></div>
+    </div>
     <aside class="layer-card" id="layerCard" aria-live="polite">
       <h3 id="layerName"></h3>
       <span class="thickness-chip" id="layerThickness"></span>
@@ -276,6 +125,6 @@
      Candidacy, risks, and outcomes vary — always consult a qualified ophthalmologist.</p>
 </footer>
 
-<script src="script.js"></script>
+<script type="module" src="main.js"></script>
 </body>
 </html>

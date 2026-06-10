@@ -110,7 +110,7 @@ h1, h2, h3 { font-family: "Sora", system-ui, sans-serif; }
 .section-sub {
   text-align: center;
   color: var(--ink-soft);
-  max-width: 640px;
+  max-width: 680px;
   margin: 12px auto 44px;
 }
 
@@ -164,7 +164,31 @@ h1, h2, h3 { font-family: "Sora", system-ui, sans-serif; }
 .step-btn.active .dot { background: var(--teal-bright); color: #fff; }
 .step-btn.done .dot { background: #bbf7d0; color: #15803d; }
 
-/* ---------- Stage ---------- */
+/* ---------- 3D canvases ---------- */
+.canvas3d {
+  position: relative;
+  width: 100%;
+  background:
+    radial-gradient(700px 360px at 50% 0%, rgba(14,165,233,0.10), transparent),
+    linear-gradient(180deg, #fdfeff, #eef8fd);
+  touch-action: none;
+}
+.canvas3d canvas { display: block; width: 100% !important; height: 100% !important; }
+
+.stage3d { height: 480px; }
+.layers3d { height: 420px; border-radius: var(--radius) var(--radius) 0 0; }
+
+.webgl-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+.webgl-fallback[hidden] { display: none; }
+
 .stage-frame {
   background: var(--card);
   border: 1px solid var(--line);
@@ -173,7 +197,17 @@ h1, h2, h3 { font-family: "Sora", system-ui, sans-serif; }
   overflow: hidden;
 }
 
-#stage { display: block; width: 100%; height: auto; background: #fdfeff; }
+.stage-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 18px;
+  background: #f0f9fd;
+  border-top: 1px solid var(--line);
+}
+.stage-caption { font-size: 0.92rem; font-weight: 500; color: var(--teal); }
+.stage-hint { font-size: 0.78rem; color: #8fb6c4; white-space: nowrap; }
 
 .stage-progress { height: 6px; background: #e4f3f9; }
 #progressBar {
@@ -181,27 +215,6 @@ h1, h2, h3 { font-family: "Sora", system-ui, sans-serif; }
   background: linear-gradient(90deg, var(--teal-bright), var(--teal));
   transition: width 0.45s ease;
 }
-
-.svg-label {
-  font-family: "Inter", sans-serif;
-  font-size: 12.5px;
-  fill: var(--ink-soft);
-  font-weight: 500;
-}
-.svg-label.inverse { fill: #e2e8f0; font-size: 11px; letter-spacing: 0.06em; }
-.svg-label.faint { fill: #8fb6c4; font-style: italic; }
-
-.bg-fill { fill: #fdfeff; }
-
-.hidden-el { opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
-.visible-el { opacity: 1; pointer-events: auto; transition: opacity 0.4s ease; }
-
-/* Flap motion */
-#flap {
-  transform-origin: 260px 342px;
-  transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
-}
-#flap.open { transform: rotate(-120deg); }
 
 /* ---------- Step card ---------- */
 .step-card {
@@ -285,40 +298,40 @@ h1, h2, h3 { font-family: "Sora", system-ui, sans-serif; }
   align-items: start;
 }
 
-.layer-stack {
-  border-radius: var(--radius);
-  overflow: hidden;
+.explorer-left {
+  background: var(--card);
   border: 1px solid var(--line);
+  border-radius: var(--radius);
   box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
-.layer-band {
-  width: 100%;
+.layer-chips {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  border: none;
-  font: inherit;
-  font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0 22px;
-  cursor: pointer;
-  color: rgba(20, 32, 38, 0.85);
-  position: relative;
-  transition: filter 0.15s, transform 0.15s;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--line);
+  background: #f0f9fd;
 }
-.layer-band:hover { filter: brightness(1.06); }
-.layer-band .band-thickness { font-weight: 500; font-size: 0.8rem; opacity: 0.75; white-space: nowrap; }
 
-.layer-band.selected::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border: 3px solid var(--teal);
-  pointer-events: none;
+.layer-chip {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(20, 32, 38, 0.85);
+  background: var(--chip-color, #eee);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
 }
-.layer-band.selected { filter: brightness(1.04); }
+.layer-chip:hover { transform: translateY(-1px); }
+.layer-chip.selected {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.25);
+}
 
 .layer-card {
   background: var(--card);
@@ -379,95 +392,13 @@ h1, h2, h3 { font-family: "Sora", system-ui, sans-serif; }
 }
 .footer p { max-width: 720px; margin: 0 auto; }
 
-/* ================= SVG ANIMATIONS ================= */
-
-/* Topography scan */
-.scanline line { animation: scan 2.4s ease-in-out infinite alternate; }
-@keyframes scan {
-  from { transform: translateY(-64px); }
-  to   { transform: translateY(-2px); }
-}
-.topo-rings ellipse { animation: ringPulse 2.4s ease-in-out infinite; }
-.topo-rings ellipse:nth-child(2) { animation-delay: 0.15s; }
-.topo-rings ellipse:nth-child(3) { animation-delay: 0.3s; }
-.topo-rings ellipse:nth-child(4) { animation-delay: 0.45s; }
-.topo-rings ellipse:nth-child(5) { animation-delay: 0.6s; }
-@keyframes ringPulse { 0%,100% { opacity: 0.45; } 50% { opacity: 0.95; } }
-
-/* Falling droplets */
-.droplet { animation: fall 1.6s cubic-bezier(0.5, 0, 0.9, 0.4) infinite; }
-.droplet.d2 { animation-delay: 0.8s; }
-@keyframes fall {
-  0%   { transform: translateY(0); opacity: 0; }
-  8%   { opacity: 1; }
-  78%  { transform: translateY(160px); opacity: 1; }
-  82%  { transform: translateY(164px); opacity: 0; }
-  100% { transform: translateY(164px); opacity: 0; }
-}
-.ripple { animation: ripple 1.6s ease-out infinite 1.2s; opacity: 0; }
-@keyframes ripple {
-  0%   { transform: scale(0.4); opacity: 0.9; }
-  60%  { transform: scale(2.4); opacity: 0; }
-  100% { opacity: 0; }
-}
-.ripple { transform-origin: 436px 302px; transform-box: view-box; }
-.droplet { transform-box: fill-box; }
-
-/* Suction press-down */
-.press { animation: press 2.2s ease-in-out infinite alternate; }
-@keyframes press { from { transform: translateY(-6px); } to { transform: translateY(2px); } }
-
-/* Femtosecond sweep */
-.femto-beam { animation: sweep 2.6s ease-in-out infinite alternate; }
-@keyframes sweep {
-  from { transform: translateX(280px); }
-  to   { transform: translateX(596px); }
-}
-.drawing-cut {
-  stroke-dashoffset: 0;
-  animation: dashmove 1.2s linear infinite;
-}
-@keyframes dashmove { from { stroke-dashoffset: 28; } to { stroke-dashoffset: 0; } }
-.bubbles circle { animation: bubblePop 1.5s ease-in-out infinite; }
-.bubbles circle:nth-child(2n) { animation-delay: 0.4s; }
-.bubbles circle:nth-child(3n) { animation-delay: 0.8s; }
-@keyframes bubblePop { 0%,100% { opacity: 0.35; } 50% { opacity: 1; } }
-
-/* Excimer pulses */
-.uv-beams line { animation: zap 0.9s ease-in-out infinite; }
-.uv-beams line:nth-child(2) { animation-delay: 0.18s; }
-.uv-beams line:nth-child(3) { animation-delay: 0.36s; }
-.uv-beams line:nth-child(4) { animation-delay: 0.54s; }
-.uv-beams line:nth-child(5) { animation-delay: 0.72s; }
-@keyframes zap { 0%,100% { opacity: 0.15; } 50% { opacity: 0.95; } }
-.sparks circle { animation: bubblePop 0.8s ease-in-out infinite; }
-
-/* Healing glow */
-.heal-glow { animation: breathe 2.6s ease-in-out infinite; }
-@keyframes breathe { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
-.sparkle path { animation: twinkle 2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-.sparkle path:nth-child(2) { animation-delay: 0.5s; }
-.sparkle path:nth-child(3) { animation-delay: 1s; }
-@keyframes twinkle {
-  0%,100% { opacity: 0.3; transform: scale(0.8); }
-  50%     { opacity: 1; transform: scale(1.1); }
-}
-
-/* Seam fading in step 8 */
-#seam.fading { animation: seamFade 3s ease-in-out infinite alternate; }
-@keyframes seamFade { from { opacity: 0.9; } to { opacity: 0.25; } }
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
-}
-
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
   .walkthrough { grid-template-columns: 1fr; }
   .steps-nav { order: 2; }
   .steps-list { flex-direction: row; overflow-x: auto; padding-bottom: 6px; }
   .step-btn { white-space: nowrap; width: auto; }
+  .stage3d { height: 380px; }
   .explorer { grid-template-columns: 1fr; }
   .layer-card { position: static; }
 }
