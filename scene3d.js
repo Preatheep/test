@@ -27,9 +27,63 @@ function makeControls(camera, renderer, target) {
   controls.target.copy(target);
   controls.enableDamping = true;
   controls.enablePan = false;
+  controls.rotateSpeed = 0.9;
   controls.touches.ONE = THREE.TOUCH.ROTATE;
   controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.8;
+  controls.addEventListener("start", () => { controls.autoRotate = false; });
   return controls;
+}
+
+/* Embedded-viewer chrome: a tap-to-interact gate (so the page scrolls until the
+   user opts in) plus an Expand button that blows the canvas up to a full-screen
+   interactive box. Works on touch and desktop alike. */
+function setupViewer(container, controls, dom) {
+  const isTouch = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+  let expanded = false;
+
+  const tools = document.createElement("div");
+  tools.className = "viewer-tools";
+  const expandBtn = document.createElement("button");
+  expandBtn.type = "button";
+  expandBtn.className = "viewer-btn";
+  expandBtn.innerHTML = "⤢ <span>Expand</span>";
+  tools.appendChild(expandBtn);
+  container.appendChild(tools);
+
+  const gate = document.createElement("button");
+  gate.type = "button";
+  gate.className = "viewer-gate";
+  gate.innerHTML = "<span>👆 Tap to rotate in 3D</span>";
+  container.appendChild(gate);
+
+  function setActive(on) {
+    controls.enabled = on;
+    dom.style.touchAction = on ? "none" : "pan-y";
+    gate.hidden = on || !isTouch || expanded;
+  }
+
+  if (isTouch) setActive(false);
+  else { controls.enabled = true; gate.hidden = true; }
+
+  gate.addEventListener("click", () => setActive(true));
+
+  function setExpanded(on) {
+    expanded = on;
+    container.classList.toggle("viewer-expanded", on);
+    document.body.classList.toggle("viewer-lock", on);
+    expandBtn.innerHTML = on ? "✕ <span>Close</span>" : "⤢ <span>Expand</span>";
+    if (on) {
+      controls.enabled = true;
+      dom.style.touchAction = "none";
+      gate.hidden = true;
+    } else if (isTouch) {
+      setActive(false);
+    }
+  }
+  expandBtn.addEventListener("click", () => setExpanded(!expanded));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && expanded) setExpanded(false); });
 }
 
 function addLights(scene) {
@@ -73,6 +127,7 @@ export function createStage(container) {
   controls.maxPolarAngle = 1.48;
   addLights(scene);
   watchResize(container, camera, renderer);
+  setupViewer(container, controls, renderer.domElement);
 
   const C = { y: 0.52, r: 0.65, flapTheta: 0.62 };
   const flapRimR = C.r * Math.sin(C.flapTheta);          // 0.378
@@ -568,6 +623,7 @@ export function createLayers(container, layers, onSelect) {
   controls.maxDistance = 8;
   addLights(scene);
   watchResize(container, camera, renderer);
+  setupViewer(container, controls, renderer.domElement);
 
   const THETA = 0.52;
   const thick = [0.028, 0.075, 0.034, 0.3, 0.034, 0.045];
