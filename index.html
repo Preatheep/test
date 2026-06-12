@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LASIK vs Contoura vs SMILE — An Interactive 3D Guide</title>
+<meta name="description" content="Compare LASIK, Contoura Vision and SMILE laser eye surgery on interactive 3D eye models, step by step — and see which might suit you.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js",
+    "three/addons/controls/OrbitControls.js": "./vendor/OrbitControls.js"
+  }
+}
+</script>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="hero-badge">Interactive 3D guide</span>
+    <h1>Laser Eye Surgery, <span class="accent">in 3D</span></h1>
+    <p class="hero-sub">
+      Three ways to reshape the cornea and free yourself from glasses — <strong>LASIK</strong>,
+      <strong>Contoura&nbsp;Vision</strong> and <strong>SMILE</strong>. Explore each one step by step
+      on an interactive 3D eye, compare the differences, and see which might suit you.
+    </p>
+    <div class="hero-stats">
+      <div class="stat"><strong>3 procedures</strong><span>side by side</span></div>
+      <div class="stat"><strong>Drops only</strong><span>no needles</span></div>
+      <div class="stat"><strong>~10 min/eye</strong><span>typical laser time</span></div>
+      <div class="stat"><strong>~24 hrs</strong><span>to clearer vision</span></div>
+    </div>
+    <div class="hero-ctas">
+      <a href="#procedure" class="hero-cta">Explore the procedures ↓</a>
+      <a href="#compare" class="hero-cta ghost">Compare them</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ PROCEDURE WALKTHROUGH ============ -->
+<section id="procedure" class="section">
+  <h2 class="section-title">Walk through each procedure</h2>
+  <p class="section-sub">Pick a procedure, then click a step (or use the arrow keys) to watch it on the 3D eye. Drag to rotate, pinch or scroll to zoom.</p>
+
+  <div class="proc-tabs" id="procTabs" role="tablist" aria-label="Choose a procedure"></div>
+  <p class="proc-blurb" id="procBlurb"></p>
+
+  <div class="walkthrough">
+
+    <nav class="steps-nav" aria-label="Procedure steps">
+      <ol id="stepsList" class="steps-list"></ol>
+    </nav>
+
+    <div class="stage-wrap">
+      <div class="stage-frame">
+        <div id="stage3d" class="canvas3d stage3d" aria-label="3D eye model showing the current step">
+          <p class="webgl-fallback" hidden>Your browser doesn't support WebGL, so the 3D model can't be shown. The step descriptions below still walk you through the whole procedure.</p>
+        </div>
+        <div class="stage-overlay">
+          <span id="stageCaption" class="stage-caption"></span>
+          <span class="stage-hint">drag to rotate · pinch/scroll to zoom</span>
+        </div>
+        <div class="stage-progress"><div id="progressBar"></div></div>
+      </div>
+
+      <article class="step-card" id="stepCard" aria-live="polite">
+        <div class="step-card-head">
+          <span class="step-num" id="cardNum">1</span>
+          <h3 id="cardTitle"></h3>
+          <span class="duration-chip" id="cardDuration"></span>
+        </div>
+        <p id="cardBody"></p>
+        <div class="fact" id="cardFact"></div>
+        <div class="step-controls">
+          <button id="prevBtn" class="btn ghost">← Previous</button>
+          <button id="playBtn" class="btn primary">▶ Play all steps</button>
+          <button id="nextBtn" class="btn ghost">Next →</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPARISON ============ -->
+<section id="compare" class="section alt">
+  <h2 class="section-title">How they compare</h2>
+  <p class="section-sub">The big difference is the flap: LASIK and Contoura lift one; SMILE doesn't. Here's how that ripples through everything else.</p>
+
+  <div class="compare-grid" id="compareGrid" role="table" aria-label="Comparison of LASIK, Contoura Vision and SMILE"></div>
+
+  <h2 class="section-title choose-title">Which might suit you?</h2>
+  <p class="section-sub">A quick starting point — your surgeon's exam is what ultimately decides.</p>
+  <div class="choose-grid" id="chooseGrid"></div>
+</section>
+
+<!-- ============ LAYER EXPLORER ============ -->
+<section id="layers" class="section">
+  <h2 class="section-title">Explore the cornea's six layers in 3D</h2>
+  <p class="section-sub">All three procedures reshape the same tissue. The cornea is about 540 µm thick — half a millimetre. Click a layer in the model (or a chip below) to pull it out and see what each surgery does to it. Thicknesses are exaggerated for visibility.</p>
+
+  <div class="explorer">
+    <div class="explorer-left">
+      <div id="layers3d" class="canvas3d layers3d" aria-label="Exploded 3D view of the six corneal layers">
+        <p class="webgl-fallback" hidden>Your browser doesn't support WebGL, so the 3D layers can't be shown. Use the buttons below to read about each layer.</p>
+      </div>
+      <div class="layer-chips" id="layerChips" role="tablist" aria-label="Corneal layers"></div>
+    </div>
+    <aside class="layer-card" id="layerCard" aria-live="polite">
+      <h3 id="layerName"></h3>
+      <span class="thickness-chip" id="layerThickness"></span>
+      <p id="layerDesc"></p>
+      <div class="lasik-note">
+        <strong>During surgery:</strong>
+        <p id="layerLasik"></p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ VIDEO ============ -->
+<section id="video" class="section alt">
+  <h2 class="section-title">Watch the real procedure</h2>
+  <p class="section-sub">This guide is based on the video below — see actual surgery footage.</p>
+  <div class="video-frame">
+    <iframe src="https://www.youtube.com/embed/YzZre0OcLXQ"
+            title="Laser eye surgery video"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen loading="lazy"></iframe>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <p><strong>Educational use only.</strong> This page simplifies medical procedures for learning purposes and is not medical advice.
+     Candidacy, risks, costs and outcomes vary by individual and by clinic — always consult a qualified ophthalmologist before choosing a treatment.</p>
+</footer>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
